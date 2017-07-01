@@ -1,0 +1,80 @@
+#!/usr/bin/python3
+
+import os
+
+import argparse
+
+import prism
+import prism.config
+from prism.config import config as prism_config
+import prism.log as log
+
+def get_cwd_app():
+    for app_name in prism_config['apps']:
+        if os.getcwd() in prism_config['apps'][app_name]['locations']:
+            return app_name
+    return None
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Deploy WSGI applications.')
+    parser.add_argument('-a', '--app', help='The application to configure.')
+
+    subparser_action = parser.add_subparsers(title='application actions', dest='action')
+    subparser_action.required = True
+
+    create = subparser_action.add_parser('create', help='Create the application\'s environment. Uses current folder unless specified otherwise.')
+    create.add_argument('-G', '--git', help='The application\'s git repository.')
+    create.add_argument('-F', '--file', help='The application\'s folder location.')
+    create.add_argument('-L', '--local-config', help='Set the application to use a local config file.', action='store_true')
+
+    subparser_action.add_parser('nuke', help='Nuke all Prism config and data files. (This includes all application environments!)')
+
+    subparser_action.add_parser('destroy', help='Destroy the application.')
+    subparser_action.add_parser('restart', help='Restart the application.')
+    subparser_action.add_parser('update', help='Update the application.')
+    subparser_action.add_parser('depends', help='Install the application\'s dependencies in the virtualenv.')
+
+
+    route = subparser_action.add_parser('route', help='Create a route to the application.')
+    route = route.add_subparsers(title='route actions', dest='do')
+
+    route_add = route.add_parser('add', help='Add a new route.')
+    route_add.add_argument('fqdn', help='The domain to expose the application from.')
+    route_add.add_argument('-S', '--https', help='Enable Let\'s Encrypt SSL.', action='store_true')
+    route_add.add_argument('-P', '--port', help='Set the endpoint port.', type=int)
+
+    route_del = route.add_parser('del', help='Delete a route.')
+    route_del.add_argument('index', help='Index of the route to delete.', type=int)
+
+    subparser_action.add_parser('expose', help='Toggle exposing the application using the defined routes.')
+
+
+    args = parser.parse_args()
+
+    if args.action == 'nuke':
+        prism.config.nuke()
+
+    if args.action == 'create':
+        if args.file is not None:
+            args.file = os.path.abspath(args.file)
+        elif args.git is not None:
+            pass
+        else:
+            args.file = os.getcwd()
+
+        if get_cwd_app() is not None:
+            log.die('An application already exists in this directory.')
+
+        if args.app is None:
+            args.app = os.path.basename(os.getcwd())
+
+    if args.app is None:
+        args.app = get_cwd_app()
+        if args.app is None:
+            log.die('No application selected.')
+
+    os.chdir('/etc/prism/env/')
+
+    app = prism.App(args.app)
+    mod = __import__('prism.action.%s' % args.action, globals(), locals(), ['object'], 0)
+    mod.run(app, args)
