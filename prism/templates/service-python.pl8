@@ -1,0 +1,13 @@
+[Unit]
+Description=Prism generated Python service for {app_name}
+After=network.target
+
+[Service]
+User=root
+Group=nginx
+WorkingDirectory={app_env}
+Environment="PATH={app_env}/bin{environment}"
+ExecStart={app_env}/bin/python --bind unix:nginx.sock wsgi.py
+
+[Install]
+WantedBy=multi-user.target

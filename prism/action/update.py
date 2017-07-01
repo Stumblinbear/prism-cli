@@ -1,17 +1,17 @@
 import os
 import shutil
 
-from prism.deco import header, require_app, log_group
-import prism.log as log
-import prism.protocol as protocol
-import prism.template
+from ..deco import header, require_app, log_group
+from .. import log
+from .. import protocol
+from .. import template
 
-import prism.action.depends
+from .depends import run as action_depends
 
 
 @header('App Updating')
 @require_app
-@log_group('Building application files...', 'Application tree generated.')
+@log_group('Building application files...', 'Application tree generated')
 def run(app, args):
     if os.path.exists(app.app_folder):
         app.command.run('rm -rf %s' % app.app_folder)
@@ -19,18 +19,23 @@ def run(app, args):
     if os.path.exists(os.path.join(app.app_env, 'wsgi.py')):
         app.command.run('rm -rf %s' % os.path.join(app.app_folder, 'wsgi.py'))
 
+    # Rebuild the app environment
     protocol.build(app, args)
 
-    prism.action.depends.run(app, args)
+    # Install dependencies
+    action_depends(app, args)
 
+    # If there is a wsgi file, copy that to the environment base directory.
     if os.path.exists(os.path.join(app.app_folder, 'wsgi.py')):
         log.info('Using \'wsgi.py\' in application files')
         shutil.copyfile(os.path.join(app.app_folder, 'wsgi.py'), os.path.join(app.app_env, 'wsgi.py'))
     else:
-        log.info('File not found. Generating wsgi.py')
+        # If there is no wsgi file, generate one.
+        log.info('File not found. Generating \'wsgi.py\'')
         with open(os.path.join(app.app_env, 'wsgi.py'), 'w') as file:
-            file.write(prism.template.get('wsgi', {'app_name': os.path.basename(app.app_folder)}))
+            file.write(template.get('wsgi', {'app_name': os.path.basename(app.app_folder)}))
 
+    # If there is no __init__.py, create one so it's recognized as a module
     if not os.path.exists(os.path.join(app.app_folder, '__init__.py')):
         log.info('Generating \'__init__.py\' in application files')
         open(os.path.join(app.app_folder, '__init__.py'), 'a').close()

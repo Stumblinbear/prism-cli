@@ -1,28 +1,34 @@
 import os
 
-from prism.deco import header, require_app, log_group
-import prism.log as log
-from prism.config import Static, save_config
-from prism.config import config as prism_config
-import prism.command as command
+from ..deco import header, require_app, log_group
+from .. import log
+from ..config import Static, save_config
+from ..config import config as prism_config
+from .. import command
+
+from .. import service
+from .. import exposer
+
+from .stop import run as action_stop
 
 
 @header('App Destruction')
 @require_app
-@log_group('Destroying application...', 'Application destroyed.')
+@log_group('Destroying application...', 'Application destroyed')
 def run(app, args):
-    del prism_config['apps'][app.app_name]
-    save_config()
+    # Stop the service
+    action_stop(app, args)
 
+    # Destroy the service files
+    service.destroy(app, args)
+
+    if app.has_exposer:
+        # Tell the exposer to destroy the app config
+        exposer.destroy(app, args)
+
+    # Remove the app environment
     command.run('rm -rf %s' % app.app_env)
 
-    if os.path.exists(os.path.join(Static.nginx, '%s.conf' % app.app_name)):
-        command.run('rm -f %s' % os.path.join(Static.nginx, '%s.conf' % app.app_name))
-
-    if os.path.exists(os.path.join(Static.services, 'prism_%s.service' % app.app_name)):
-        command.run('systemctl disable prism_%s' % app.app_name)
-        command.run('systemctl stop prism_%s' % app.app_name)
-        command.run('rm -f %s' % os.path.join(Static.services, 'prism_%s.service' % app.app_name))
-
-        command.run('systemctl daemon-reload')
-        command.run('systemctl restart nginx')
+    # Remove the app from the config
+    del prism_config['apps'][app.app_name]
+    save_config()

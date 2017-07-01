@@ -1,7 +1,7 @@
 import subprocess
 import importlib
 
-import prism.log as log
+from . import log
 
 
 def exists(cmd):

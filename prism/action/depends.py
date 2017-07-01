@@ -1,16 +1,25 @@
 import os
 
-from prism.deco import header, require_app, log_group
-import prism.log as log
+from ..deco import header, require_app, log_group
+from .. import log
+
+from .. import exposer
+from .. import service
 
 
 @header('App Depends Install')
 @require_app
-@log_group('Installing requirements...', 'Requirements installed.')
+@log_group('Installing requirements...', 'Requirements installed')
 def run(app, args):
-    app.command.run_in_virtualenv('pip install gunicorn', use_splitter=True)
+    if app.has_exposer:
+        # Install exposer dependencies
+        exposer.depends(app, args)
 
+    # Install service dependencies
+    service.depends(app, args)
+
+    # Install python requirements
     if os.path.exists(os.path.join(app.app_folder, 'requirements.txt')):
         app.command.run_in_virtualenv('pip install -r requirements.txt', precmd=['cd ' + app.app_name], use_splitter=True)
     else:
-        log.info('No requirements.txt, skipping dependency install.')
+        log.info('No requirements.txt, skipping dependency install')

@@ -2,9 +2,9 @@ import os
 import json
 
 import prism.log as log
-from prism.config import save_config
-from prism.config import config as prism_config
+from . import config
 import prism.command
+
 
 class App:
     def __init__(self, app_name):
@@ -18,7 +18,7 @@ class App:
         self.config = None
 
         if self.is_created:
-            self.app_config = prism_config['apps'][self.app_name]
+            self.app_config = config.config['apps'][self.app_name]
 
             self.app_src = self.app_config['source_folder']
 
@@ -42,11 +42,15 @@ class App:
 
     @property
     def is_created(self):
-        return self.app_name in prism_config['apps']
+        return self.app_name in config.config['apps']
+
+    @property
+    def has_exposer(self):
+        return hasattr(self, 'app_config') and 'exposer' in self.app_config and self.app_config['exposer'] is not None
 
     def save_config(self):
         if not self.is_created:
-            log.die('Attempt to save the config of an uncreated application.')
+            log.die('Attempt to save the config of an uncreated application')
 
         if type(self.app_config['config']) == str:
             if self.app_config['config'] == 'local':
@@ -56,9 +60,9 @@ class App:
                 with open(os.path.join(self.app_config['source_folder'], 'prism.json'), 'w') as file:
                     json.dump(self.config, file)
             else:
-                log.die('Unknown config setting.')
+                log.die('Unknown config setting')
         else:
-            save_config()
+            config.save_config()
 
 class AppCommand:
     def __init__(self, app):

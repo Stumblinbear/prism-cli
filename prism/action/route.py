@@ -1,5 +1,5 @@
-from prism.deco import header, require_app, save_app
-import prism.log as log
+from ..deco import header, require_app, save_app
+from .. import log
 
 
 @header('App Route')
@@ -44,19 +44,19 @@ def run(app, args):
 
         for r in app.config['routes']:
             if r == route:
-                log.die('A route with those options already exists.')
+                log.die('A route with those options already exists!')
 
         app.config['routes'].append(route)
 
-        log.action('Route created.')
+        log.action('Route created')
     elif args.do == 'del':
         log.doing('Removing route...')
         if 'routes' not in app.config:
-            log.die('No routes created.')
+            log.die('No routes created!')
 
         if args.index < 1 or args.index > len(app.config['routes']):
-            log.die('No route with that index.')
+            log.die('No route with that index!')
 
         del app.config['routes'][args.index - 1]
 
-        log.action('Route removed.')
+        log.action('Route removed')

@@ -1,6 +1,7 @@
 from functools import wraps
 
-import prism.log as log
+from . import log
+
 
 def save_app(func):
     def wrapper(app, *args, **kwargs):
@@ -24,7 +25,7 @@ def require_app(inverse=False):
         def wrapper(app, *args, **kwargs):
             if inverse:
                 if app.is_created:
-                    log.fail('Application already exists.')
+                    log.fail('Application already exists!')
                     return
             else:
                 if not app.is_created:

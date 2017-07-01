@@ -2,9 +2,11 @@ import os
 import json
 import shutil
 
-import prism.log as log
-import prism.command as command
-from prism.command import Package, Library
+from . import log
+from . import command
+from .command import Package, Library
+
+from . import exposer
 
 
 class Static:
@@ -15,7 +17,6 @@ class Static:
     env = os.path.join(main, 'env/')
     config = os.path.join(main, 'config.json')
 
-    nginx = '/etc/nginx/conf.d/'
     services = '/etc/systemd/system/'
 
 config = None
@@ -23,7 +24,7 @@ config = None
 def verify_dependencies():
     if command.exists('apt'):
         Package.is_yum = False
-        log.die('No apt support, yet.')
+        log.die('No apt support, yet!')
     elif command.exists('yum'):
         def pkg_install(pkg):
             if command.exists('sudo'):
@@ -33,10 +34,9 @@ def verify_dependencies():
 
         Package.install = pkg_install
     else:
-        log.die('Package manager not supported.')
+        log.die('Package manager not supported!')
 
     Package.require('python-devel', apt='python-dev')
-    Package.require('nginx')
     Library.require('virtualenv')
 
     if 'enabled' not in command.get_output_quiet('systemctl is-enabled nginx'):

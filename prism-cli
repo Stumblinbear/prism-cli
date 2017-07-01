@@ -9,6 +9,7 @@ import prism.config
 from prism.config import config as prism_config
 import prism.log as log
 
+
 def get_cwd_app():
     for app_name in prism_config['apps']:
         if os.getcwd() in prism_config['apps'][app_name]['locations']:
@@ -23,6 +24,8 @@ if __name__ == '__main__':
     subparser_action.required = True
 
     create = subparser_action.add_parser('create', help='Create the application\'s environment. Uses current folder unless specified otherwise.')
+    create.add_argument('-S', '--service', help='The application\'s service type. Default: python', choices=['python', 'gunicorn'], default='python')
+    create.add_argument('-E', '--exposer', help='The application\'s WWW exposer. Default: None', choices=['nginx', 'apache'], default=None)
     create.add_argument('-G', '--git', help='The application\'s git repository.')
     create.add_argument('-F', '--file', help='The application\'s folder location.')
     create.add_argument('-L', '--local-config', help='Set the application to use a local config file.', action='store_true')
@@ -30,10 +33,14 @@ if __name__ == '__main__':
     subparser_action.add_parser('nuke', help='Nuke all Prism config and data files. (This includes all application environments!)')
 
     subparser_action.add_parser('destroy', help='Destroy the application.')
-    subparser_action.add_parser('restart', help='Restart the application.')
+
+    subparser_action.add_parser('start', help='Start the application service.')
+    subparser_action.add_parser('stop', help='Stop the application service.')
+    subparser_action.add_parser('restart', help='Restart the application service.')
+
     subparser_action.add_parser('update', help='Update the application.')
     subparser_action.add_parser('depends', help='Install the application\'s dependencies in the virtualenv.')
-
+    subparser_action.add_parser('expose', help='Toggle exposing the application using the defined routes.')
 
     route = subparser_action.add_parser('route', help='Create a route to the application.')
     route = route.add_subparsers(title='route actions', dest='do')
@@ -45,8 +52,6 @@ if __name__ == '__main__':
 
     route_del = route.add_parser('del', help='Delete a route.')
     route_del.add_argument('index', help='Index of the route to delete.', type=int)
-
-    subparser_action.add_parser('expose', help='Toggle exposing the application using the defined routes.')
 
 
     args = parser.parse_args()
@@ -63,7 +68,7 @@ if __name__ == '__main__':
             args.file = os.getcwd()
 
         if get_cwd_app() is not None:
-            log.die('An application already exists in this directory.')
+            log.die('An application already exists in this directory!')
 
         if args.app is None:
             args.app = os.path.basename(os.getcwd())
@@ -71,7 +76,7 @@ if __name__ == '__main__':
     if args.app is None:
         args.app = get_cwd_app()
         if args.app is None:
-            log.die('No application selected.')
+            log.die('No application selected!')
 
     os.chdir('/etc/prism/env/')
 
