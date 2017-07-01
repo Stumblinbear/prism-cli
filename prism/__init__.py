@@ -1,13 +1,12 @@
 import os
 import json
 
-from prism.mapping import Mapping
 import prism.log as log
 from prism.config import save_config
 from prism.config import config as prism_config
 import prism.command
 
-class App(Mapping):
+class App:
     def __init__(self, app_name):
         self.app_name = app_name
         self.command = AppCommand(self)
