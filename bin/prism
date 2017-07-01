@@ -1,6 +1,20 @@
 #!/usr/bin/python3
+#  -*- coding: utf-8 -*-
+# *****************************************************************************
+# Prism CLI
+# Copyright (c) 2017 by the Prism CLI authors (see AUTHORS)
+
+# Module authors:
+#   Trevin Miller <stumblinbear@gmail.com>
+#
+# *****************************************************************************
+
 
 import os
+
+if not os.path.realpath(__file__).startswith('/usr/lib/python'):
+    import sys
+    sys.path.append(os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir, os.pardir)))
 
 import argparse
 

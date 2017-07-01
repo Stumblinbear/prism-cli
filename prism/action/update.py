@@ -1,3 +1,13 @@
+#  -*- coding: utf-8 -*-
+# *****************************************************************************
+# Prism CLI
+# Copyright (c) 2017 by the Prism CLI authors (see AUTHORS)
+
+# Module authors:
+#   Trevin Miller <stumblinbear@gmail.com>
+#
+# *****************************************************************************
+
 import os
 import shutil
 
