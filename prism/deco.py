@@ -29,7 +29,7 @@ def require_app(inverse=False):
                     return
             else:
                 if not app.is_created:
-                    log.fail('No application with that name.')
+                    log.fail('No application with that name!')
                     return
             return func(app, *args, **kwargs)
         return wrapper
