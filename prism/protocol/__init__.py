@@ -17,8 +17,8 @@ def get_protocol(app):
     try:
         mod = __import__('prism.protocol.%s' % app.app_config['type'], globals(), locals(), ['object'], 0)
         return mod
-    except:
-        log.die('Protocol %r failure.' % app.app_config['type'])
+    except Exception as e:
+        log.die('Protocol %r failure.' % app.app_config['type'], e)
 
 def create(app, args):
     return get_protocol(app).create(app, args)

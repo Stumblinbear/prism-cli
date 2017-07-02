@@ -53,6 +53,6 @@ def action(str):
 def fail(str):
     output('[!]', str, color='\033[41m')
 
-def die(str):
-    output('[X]', str, color='\033[41m')
+def die(str, e=None):
+    output('[X]', str + (' (%s)' % e if e is not None else ''), color='\033[41m')
     exit()

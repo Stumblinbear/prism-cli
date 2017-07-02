@@ -33,7 +33,7 @@ def destroy(app, args):
 def start(app, args):
     if 'enabled' not in command.get_output_quiet('systemctl is-enabled prism_%s' % app.app_name):
         command.run('systemctl enable prism_%s' % app.app_name)
-    if 'active' not in command.get_output_quiet('systemctl is-active prism_%s' % app.app_name):
+    if 'inactive' in command.get_output_quiet('systemctl is-active prism_%s' % app.app_name):
         command.run('systemctl start prism_%s' % app.app_name)
 
 def stop(app, args):

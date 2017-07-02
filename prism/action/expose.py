@@ -10,7 +10,7 @@
 
 import os
 
-from ..deco import header, require_app
+from ..deco import header, require_app, save_app
 from .. import log
 
 from .restart import run as action_restart
@@ -22,6 +22,7 @@ from .. import service
 
 @header('App WWW Exposer')
 @require_app
+@save_app
 def run(app, args):
     if not app.has_exposer:
         log.fail('Application has no exposer set!')
@@ -43,22 +44,16 @@ def run(app, args):
         return
 
     if app.app_config['exposed']:
-        log.doing('Exposing application via %r...' % app.app_config['service'])
+        log.doing('Exposing application via %r...' % app.app_config['exposer'])
 
         # Create the exposer config files
         exposer.create(app, args)
 
-        # Restart the service
-        action_restart(app, args)
-
-        log.action('Config generated for %r, application exposed successfully' % app.app_config['service'])
+        log.action('Config generated for %r, application exposed successfully' % app.app_config['exposer'])
     else:
-        log.doing('Unexposing application via %r...' % app.app_config['service'])
+        log.doing('Unexposing application via %r...' % app.app_config['exposer'])
 
         # Destroy the exposer config
         exposer.destroy(app, args)
-
-        # Stop the service
-        action_stop(app, args)
 
         log.fail('Application no longer exposed. Run the command again to re-expose the application')

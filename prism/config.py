@@ -49,11 +49,6 @@ def verify_dependencies():
     Package.require('python-devel', apt='python-dev')
     Library.require('virtualenv')
 
-    if 'enabled' not in command.get_output_quiet('systemctl is-enabled nginx'):
-        log.info('Enabling and Starting Nginx')
-        command.run('systemctl enable nginx')
-        command.run('systemctl start nginx')
-
     if not os.path.exists(Static.main):
         log.action('Created %r' % Static.main)
         os.mkdir(Static.main)

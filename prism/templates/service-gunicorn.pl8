@@ -7,7 +7,7 @@ User=root
 Group=nginx
 WorkingDirectory={app_env}
 Environment="PATH={app_env}/bin{environment}"
-ExecStart={app_env}/bin/gunicorn --name prism_{app_name} --workers {workers} --bind unix:nginx.sock -m 007 wsgi:app
+ExecStart={app_env}/bin/gunicorn --name prism_{app_name} --workers {workers} --bind unix:unix.sock -m 007 wsgi:app
 
 [Install]
 WantedBy=multi-user.target

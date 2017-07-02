@@ -16,13 +16,18 @@ from .. import log
 from .. import protocol
 from .. import template
 
+from .stop import run as action_stop
+from .start import run as action_start
 from .depends import run as action_depends
+from .expose import run as action_expose
 
 
 @header('App Updating')
 @require_app
 @log_group('Building application files...', 'Application tree generated')
 def run(app, args):
+    action_stop(app, args)
+
     if os.path.exists(app.app_folder):
         app.command.run('rm -rf %s' % app.app_folder)
 
@@ -49,3 +54,8 @@ def run(app, args):
     if not os.path.exists(os.path.join(app.app_folder, '__init__.py')):
         log.info('Generating \'__init__.py\' in application files')
         open(os.path.join(app.app_folder, '__init__.py'), 'a').close()
+
+    action_start(app, args)
+
+    if app.is_exposed:
+        action_expose(app, args)

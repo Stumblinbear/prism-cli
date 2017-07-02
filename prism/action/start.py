@@ -20,8 +20,5 @@ def run(app, args):
     # Create the service files
     service.create(app, args)
 
-    # Enable the service
-    service.enable(app, args)
-
     # Start the service
     service.start(app, args)

@@ -58,8 +58,13 @@ class App:
     def has_exposer(self):
         return hasattr(self, 'app_config') and 'exposer' in self.app_config and self.app_config['exposer'] is not None
 
+    @property
+    def is_exposed(self):
+        return hasattr(self, 'app_config') and 'exposed' in self.app_config and self.app_config['exposed']
+
     def save_config(self):
         if not self.is_created:
+            config.save_config()
             log.die('Attempt to save the config of an uncreated application')
 
         if type(self.app_config['config']) == str:
@@ -71,8 +76,7 @@ class App:
                     json.dump(self.config, file)
             else:
                 log.die('Unknown config setting')
-        else:
-            config.save_config()
+        config.save_config()
 
 class AppCommand:
     def __init__(self, app):

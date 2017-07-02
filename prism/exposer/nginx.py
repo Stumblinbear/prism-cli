@@ -10,7 +10,6 @@
 
 import os
 
-from ..config import Static
 from .. import command
 from .. import template
 
@@ -22,12 +21,11 @@ def depends(app, args):
 
 def create(app, args):
     with open(os.path.join(config_folder, '%s.conf' % app.app_name), 'w') as file:
-        format = {'listen': '', 'server_name': '', 'ssl': ''}
+        format = {'app_env': app.app_env, 'listen': '', 'server_name': '', 'ssl': ''}
         for route in app.config['routes']:
             format['listen'] += 'listen %s;' % route['port']
             format['server_name'] += 'server_name %s;' % route['fqdn']
-        format['app_env'] = app.app_env
-        file.write(template.get('nginx', format))
+        file.write(template.get('exposer-nginx', format))
 
 def destroy(app, args):
     if os.path.exists(os.path.join(config_folder, '%s.conf' % app.app_name)):

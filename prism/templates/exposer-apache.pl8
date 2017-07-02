@@ -1,0 +1,14 @@
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_http_module modules/mod_proxy_http.so
+LoadModule proxy_connect_module modules/mod_proxy_connect.so
+
+{named_host}
+{listen}
+
+<VirtualHost {ports}>
+  {server_name}
+  {ssl}
+  DocumentRoot {app_env}
+  ProxyPreserveHost On
+  ProxyPass / unix:{app_env}/unix.sock|uwsgi://{app_name}/
+</VirtualHost>

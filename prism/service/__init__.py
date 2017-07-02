@@ -15,8 +15,8 @@ def get_service(app):
     try:
         mod = __import__('prism.service.%s' % app.app_config['service'], globals(), locals(), ['object'], 0)
         return mod
-    except:
-        log.die('Service %r failure.' % app.app_config['service'])
+    except Exception as e:
+        log.die('Service %r failure.' % app.app_config['service'], e)
 
 def depends(app, args):
     return get_service(app).depends(app, args)

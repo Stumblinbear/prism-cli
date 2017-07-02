@@ -15,8 +15,8 @@ def get_exposer(app):
     try:
         mod = __import__('prism.exposer.%s' % app.app_config['exposer'], globals(), locals(), ['object'], 0)
         return mod
-    except:
-        log.die('Exposer %r failure.' % app.app_config['exposer'])
+    except Exception as e:
+        log.die('Exposer %r failure.' % app.app_config['exposer'], e)
 
 def depends(app, args):
     get_exposer(app).depends(app, args)
