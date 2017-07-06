@@ -56,10 +56,10 @@ class Library:
 
     def install(lib):
         log.doing('Installing python %r package' % lib)
-        if Command.exists('sudo'):
-            Command.run('sudo pip install %s' % lib, use_splitter=True)
+        if exists('sudo'):
+            run('sudo pip install %s' % lib, use_splitter=True)
         else:
-            Command.run('pip install %s' % lib, use_splitter=True)
+            run('pip install %s' % lib, use_splitter=True)
 
     def require(lib):
         if not Library.exists(lib):
