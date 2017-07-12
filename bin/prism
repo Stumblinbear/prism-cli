@@ -43,6 +43,7 @@ if __name__ == '__main__':
     create.add_argument('-G', '--git', help='The application\'s git repository.')
     create.add_argument('-F', '--file', help='The application\'s folder location.')
     create.add_argument('-L', '--local-config', help='Set the application to use a local config file.', action='store_true')
+    create.add_argument('-P', '--python', help='Set the application python version directory.')
 
     subparser_action.add_parser('nuke', help='Nuke all Prism config and data files. (This includes all application environments!)')
 

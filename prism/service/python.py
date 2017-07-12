@@ -20,7 +20,7 @@ def depends(app, args):
 
 def create(app, args):
     with open(os.path.join(Static.services, 'prism_%s.service' % app.app_name), 'w') as file:
-        file.write(template.get('service-python', {'app_name': app.app_name, 'app_env': app.app_env}))
+        file.write(template.get('service-python', {'start_file': app.app_config['start_file'], 'app_name': app.app_name, 'app_env': app.app_env, 'environment': ''}))
     command.run('systemctl daemon-reload')
 
 def destroy(app, args):

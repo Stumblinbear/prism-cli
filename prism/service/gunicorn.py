@@ -22,7 +22,7 @@ def depends(app, args):
 
 def create(app, args):
     with open(os.path.join(Static.services, 'prism_%s.service' % app.app_name), 'w') as file:
-        file.write(template.get('service-gunicorn', {'app_name': app.app_name, 'app_env': app.app_env, 'environment': '', 'workers': 3}))
+        file.write(template.get('service-gunicorn', {'start_file': app.app_config['start_file'], 'app_name': app.app_name, 'app_env': app.app_env, 'environment': '', 'workers': 3}))
 
 def destroy(app, args):
     python.destroy(app, args)

@@ -31,8 +31,10 @@ def run(app, args):
     if os.path.exists(app.app_folder):
         app.command.run('rm -rf %s' % app.app_folder)
 
-    if os.path.exists(os.path.join(app.app_env, 'wsgi.py')):
-        app.command.run('rm -rf %s' % os.path.join(app.app_folder, 'wsgi.py'))
+    if os.path.exists(os.path.join(app.app_env, 'start.py')):
+        app.command.run('rm -f %s' % os.path.join(app.app_folder, 'start.py'))
+    elif os.path.exists(os.path.join(app.app_env, 'wsgi.py')):
+        app.command.run('rm -f %s' % os.path.join(app.app_folder, 'wsgi.py'))
 
     # Rebuild the app environment
     protocol.build(app, args)
@@ -41,13 +43,17 @@ def run(app, args):
     action_depends(app, args)
 
     # If there is a wsgi file, copy that to the environment base directory.
-    if os.path.exists(os.path.join(app.app_folder, 'wsgi.py')):
-        log.info('Using \'wsgi.py\' in application files')
-        shutil.copyfile(os.path.join(app.app_folder, 'wsgi.py'), os.path.join(app.app_env, 'wsgi.py'))
+    start_file = ['wsgi.py', 'start.py']
+    for f in start_file:
+        if os.path.exists(os.path.join(app.app_folder, f)):
+          log.info('Using %r in application files' % f)
+          shutil.copyfile(os.path.join(app.app_folder, f), os.path.join(app.app_env, f))
+          app.app_config['start_file'] = f
+          break
     else:
-        # If there is no wsgi file, generate one.
-        log.info('File not found. Generating \'wsgi.py\'')
-        with open(os.path.join(app.app_env, 'wsgi.py'), 'w') as file:
+        # If there is no start file, generate one.
+        log.info('File not found. Generating \'start.py\'')
+        with open(os.path.join(app.app_env, 'start.py'), 'w') as file:
             file.write(template.get('wsgi', {'app_name': os.path.basename(app.app_folder)}))
 
     # If there is no __init__.py, create one so it's recognized as a module

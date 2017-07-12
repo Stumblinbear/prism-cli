@@ -25,7 +25,7 @@ from .update import run as action_update
 @require_app(inverse=True)
 @log_group('Creating application...', 'Application created')
 def run(app, args):
-    command.run('virtualenv %s' % app.app_name, use_splitter=True)
+    command.run('virtualenv %s' % (app.app_name + (' --python=' + args.python if args.python else '')), use_splitter=True)
 
     prism_config['apps'][app.app_name] = Static.default_app_config
     app.app_config = prism_config['apps'][app.app_name]

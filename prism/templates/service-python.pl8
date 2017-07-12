@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 User=root
-Group=nginx
+Group=root
 WorkingDirectory={app_env}
 Environment="PATH={app_env}/bin{environment}"
-ExecStart={app_env}/bin/python --bind unix:nginx.sock wsgi.py
+ExecStart={app_env}/bin/python {start_file}
 
 [Install]
 WantedBy=multi-user.target
